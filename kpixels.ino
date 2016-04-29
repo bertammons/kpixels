@@ -49,20 +49,15 @@ void setup() {
 }
 
 void loop() {
+  FastLED.clear();
+  startShow(showType);
+  FastLED.show(); 
+}
+
+void brightness() {
   int val = analogRead(3);
   int brightVal = map(val, 0, 1023, 0, 130);
-    
   FastLED.setBrightness(brightVal);
-  
-  FastLED.clear();
-
-  startShow(showType);
-
-  FastLED.show(); 
-
-  //digitalWrite(13, HIGH);   // turn the LED on (HIGH is the voltage level)
-  //delay(100);               // wait for a second
-  //digitalWrite(13, LOW);    // turn the LED off by making the voltage LOW  
 }
 
 void increment() {
@@ -118,6 +113,8 @@ void startShow(int i) {
             break;
   }
 }
+
+
 
 //Theatre-style crawling lights.
 void theaterChase(byte red, byte green, byte blue, int SpeedDelay) {
