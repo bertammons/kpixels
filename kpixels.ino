@@ -25,24 +25,25 @@
 #include <pixeltypes.h>
 #include <platforms.h>
 #include <power_mgt.h>
- 
+
 #define BUTTON_PIN   2    // Digital IO pin connected to the button.  This will be
                           // driven with a pull-up resistor so the switch should
                           // pull the pin to ground momentarily.  On a high -> low
 #define BUTTON_PIN2   3    // transition the button press logic will execute.
 //#define POT_PIN A3
-#define PIXEL_PIN 6    // Digital IO pin connected to the NeoPixels.
-#define PIXEL_COUNT 60
+#define DATA_PIN 6    // Digital IO pin connected to the NeoPixels.
+#define NUM_LEDS 60
 
-CRGB leds[PIXEL_COUNT];
+CRGB leds[NUM_LEDS];
 
 bool oldState = HIGH;
 int showType = 0;
 
 void setup() {
+  pinMode(13, OUTPUT); //debug blink
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(BUTTON_PIN2, INPUT_PULLUP);
-  FastLED.addLeds<NEOPIXEL, PIXEL_PIN>(leds, PIXEL_COUNT);
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
   attachInterrupt(digitalPinToInterrupt(2), increment, FALLING);
   attachInterrupt(digitalPinToInterrupt(3), decrement, FALLING);
 }
@@ -58,13 +59,17 @@ void loop() {
   startShow(showType);
 
   FastLED.show(); 
+
+  //digitalWrite(13, HIGH);   // turn the LED on (HIGH is the voltage level)
+  //delay(100);               // wait for a second
+  //digitalWrite(13, LOW);    // turn the LED off by making the voltage LOW  
 }
 
 void increment() {
 	static unsigned long last_interrupt_time = 0;
  	unsigned long interrupt_time = millis();
  	// If interrupts come faster than 200ms, assume it's a bounce and ignore
- 	if (interrupt_time - last_interrupt_time > 100) {
+ 	if (interrupt_time - last_interrupt_time > 150) {
  		showType++;
     	if (showType > 5)
     		showType=0;
@@ -76,7 +81,7 @@ void decrement() {
 	static unsigned long last_interrupt_time = 0;
  	unsigned long interrupt_time = millis();
  	// If interrupts come faster than 200ms, assume it's a bounce and ignore
- 	if (interrupt_time - last_interrupt_time > 100) {
+ 	if (interrupt_time - last_interrupt_time > 150) {
  		showType--;
     	if (showType < 0)
     		showType=5;
@@ -86,30 +91,30 @@ void decrement() {
 
 void startShow(int i) {
   switch(i){
-    case 0: for (int led = 0; led < PIXEL_COUNT; led++) {
+    case 0: for (int led = 0; led < NUM_LEDS; led++) {
               leds[led]= CRGB::Black;
             }
             break;
-    case 1: for (int led = 0; led < PIXEL_COUNT; led++) {
-              if (led < PIXEL_COUNT/2) {
+    case 1: for (int led = 0; led < NUM_LEDS; led++) {
+              if (led < NUM_LEDS/2) {
                 leds[led]= CRGB::Red;
               }
-              else if (led > PIXEL_COUNT/2) {
+              else if (led > NUM_LEDS/2) {
                 leds[led]= CRGB::Green;
               }
     }
             break;
-    case 2: for (int led = 0; led < PIXEL_COUNT; led++) {
+    case 2: for (int led = 0; led < NUM_LEDS; led++) {
               leds[led]= CRGB::Purple;  // Purple
     }
             break;
-    case 3: for (int led = 0; led < PIXEL_COUNT; led++) {
+    case 3: for (int led = 0; led < NUM_LEDS; led++) {
               leds[led]= CRGB::Blue;  // Blue
     }
             break;
-    case 4: theaterChase(0,0xff,0,100);
+    case 4: theaterChase(0,0xff,0,50);
             break;
-    case 5: rainbowCycle(5);
+    case 5: rainbowCycle(1);
             break;
   }
 }
@@ -118,14 +123,14 @@ void startShow(int i) {
 void theaterChase(byte red, byte green, byte blue, int SpeedDelay) {
   for (int j=0; j<1; j++) {  //do 10 cycles of chasing
     for (int q=0; q < 3; q++) {
-      for (int i=0; i < PIXEL_COUNT; i=i+3) {
+      for (int i=0; i < NUM_LEDS; i=i+3) {
         leds[i+q]= CRGB( red, green, blue);    //turn every third pixel on
       }
       FastLED.show(); 
      
       delay(SpeedDelay);
      
-      for (int i=0; i < PIXEL_COUNT; i=i+3) {
+      for (int i=0; i < NUM_LEDS; i=i+3) {
         leds[i+q]= CRGB( 0, 0, 0);        //turn every third pixel off
       }
     }
@@ -136,12 +141,12 @@ void rainbowCycle(int SpeedDelay) {
   byte *c;
   uint16_t i, j;
 
-  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-    for(i=0; i< PIXEL_COUNT; i++) {
-      c=Wheel(((i * 256 / PIXEL_COUNT) + j) & 255);
+  for(j=0; j<256*1; j++) { // 1 cycles of all colors on wheel
+    for(i=0; i< NUM_LEDS; i++) {
+      c=Wheel(((i * 256 / NUM_LEDS) + j) & 255);
       leds[i]= CRGB( *c, *(c+1), *(c+2));
     }
-    FastLED.show();
+    FastLED.show(); 
     delay(SpeedDelay);
   }
 }
