@@ -34,7 +34,7 @@
 #define DATA_PIN 6    // Digital IO pin connected to the NeoPixels.
 #define NUM_LEDS 60
 
-int showCount = 9;
+int showCount = 10;
 
 CRGB leds[NUM_LEDS];
 
@@ -110,6 +110,8 @@ void startShow(int i) {
             break;
     case 9: rainbowCycle(5);
             break;
+    case 10: breath(5, 255, 0, 0, 50, 5000);
+            break;
   }
 }
 
@@ -138,6 +140,27 @@ void setAll(byte red, byte green, byte blue) {
   }
   brightness();
   FastLED.show();
+}
+
+void fadeIn (int spd, byte red, byte green, byte blue) {
+  for (int k = 0; k < 255; k++) {
+    setAll(red*k, green*k, blue*k);
+    delay(spd);
+  }
+}
+
+void fadeOut (int spd, byte red, byte green, byte blue) {
+  for (int k = 255; k >= 0; k--) {
+    setAll(red*k, green*k, blue*k);
+    delay(spd);
+  }
+}
+
+void breath (int spd, byte red, byte green, byte blue, int onHold, int offHold) {
+  fadeIn(spd, red, green, blue);
+  delay(onHold);
+  fadeOut(spd, red, green, blue);
+  delay(offHold);
 }
 
 //Theatre-style crawling lights.
