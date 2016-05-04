@@ -109,7 +109,7 @@ void startShow(int i) {
             break;
     case 4: theaterChase(0,0xff,0,50);
             break;
-    case 5: rainbowCycle(1);
+    case 5: rainbowCycle(5);
             break;
   }
 }
@@ -123,8 +123,8 @@ void theaterChase(byte red, byte green, byte blue, int SpeedDelay) {
       for (int i=0; i < NUM_LEDS; i=i+3) {
         leds[i+q]= CRGB( red, green, blue);    //turn every third pixel on
       }
+      brightness();
       FastLED.show(); 
-     
       delay(SpeedDelay);
      
       for (int i=0; i < NUM_LEDS; i=i+3) {
@@ -143,6 +143,7 @@ void rainbowCycle(int SpeedDelay) {
       c=Wheel(((i * 256 / NUM_LEDS) + j) & 255);
       leds[i]= CRGB( *c, *(c+1), *(c+2));
     }
+    brightness();
     FastLED.show(); 
     delay(SpeedDelay);
   }
