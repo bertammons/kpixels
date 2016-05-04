@@ -34,6 +34,8 @@
 #define DATA_PIN 6    // Digital IO pin connected to the NeoPixels.
 #define NUM_LEDS 60
 
+int showCount = 9;
+
 CRGB leds[NUM_LEDS];
 
 bool oldState = HIGH;
@@ -66,7 +68,7 @@ void increment() {
  	// If interrupts come faster than 200ms, assume it's a bounce and ignore
  	if (interrupt_time - last_interrupt_time > 150) {
  		showType++;
-    	if (showType > 5)
+    	if (showType > showCount)
     		showType=0;
  	}
  	last_interrupt_time = interrupt_time;
@@ -79,7 +81,7 @@ void decrement() {
  	if (interrupt_time - last_interrupt_time > 150) {
  		showType--;
     	if (showType < 0)
-    		showType=5;
+    		showType=showCount;
  	}
  	last_interrupt_time = interrupt_time;
 }
@@ -90,31 +92,53 @@ void startShow(int i) {
               leds[led]= CRGB::Black;
             }
             break;
-    case 1: for (int led = 0; led < NUM_LEDS; led++) {
-              if (led < NUM_LEDS/2) {
-                leds[led]= CRGB::Red;
-              }
-              else if (led > NUM_LEDS/2) {
-                leds[led]= CRGB::Green;
-              }
-    }
+    case 1: setSplit(255, 0, 0, 0, 255, 0);
             break;
-    case 2: for (int led = 0; led < NUM_LEDS; led++) {
-              leds[led]= CRGB::Purple;  // Purple
-    }
+    case 2: setAll(255, 0, 0);
             break;
-    case 3: for (int led = 0; led < NUM_LEDS; led++) {
-              leds[led]= CRGB::Blue;  // Blue
-    }
+    case 3: setAll(0, 255, 0);
             break;
-    case 4: theaterChase(0,0xff,0,50);
+    case 4: setAll(0, 0, 255);
             break;
-    case 5: rainbowCycle(5);
+    case 5: setAll(255, 0, 255);
+            break;
+    case 6: setAll(255, 255, 0);
+            break;
+    case 7: setAll(0, 255, 255);
+            break;
+    case 8: theaterChase(0,0xff,0,50);
+            break;
+    case 9: rainbowCycle(5);
             break;
   }
 }
 
+void setPixel(int pixel, byte red, byte green, byte blue) {
+  leds[pixel].r = red;
+  leds[pixel].g = green;
+  leds[pixel].b = blue;
+}
 
+void setSplit(byte leftR, byte leftG, byte leftB, byte rightR, byte rightG, byte rightB) {
+  for (int led = 0; led < NUM_LEDS; led++) {
+    if (led < NUM_LEDS/2) {
+      leds[led]= CRGB(leftR, leftG, leftB);
+    }
+    else if (led > NUM_LEDS/2) {
+      leds[led]= CRGB(rightR, rightG, rightB);
+    }
+  brightness();
+  //FastLED.show();
+  }
+}
+
+void setAll(byte red, byte green, byte blue) {
+  for(int i = 0; i < NUM_LEDS; i++ ) {
+    setPixel(i, red, green, blue); 
+  }
+  brightness();
+  FastLED.show();
+}
 
 //Theatre-style crawling lights.
 void theaterChase(byte red, byte green, byte blue, int SpeedDelay) {
