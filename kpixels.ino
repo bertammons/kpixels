@@ -143,7 +143,7 @@ void setAll(byte red, byte green, byte blue) {
 }
 
 void fadeIn (int spd, byte red, byte green, byte blue) {
-  for (int k = 0; k < 255; k++) {
+  for (int k = 0; k < 256; k++) {
     setAll(red*k, green*k, blue*k);
     delay(spd);
   }
